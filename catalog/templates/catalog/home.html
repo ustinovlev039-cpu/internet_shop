@@ -1,0 +1,50 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Главная | Интернет-магазин{% endblock %}
+
+{% block content %}
+<section class="text-center mb-5">
+    <h1 class="display-5 fw-bold">Добро пожаловать в Online Store</h1>
+    <p class="lead text-muted">
+        Это учебный интернет-магазин, который будет развиваться на протяжении курса.
+    </p>
+    <a href="{% url 'catalog:contacts' %}" class="btn btn-primary btn-lg">
+        Связаться с нами
+    </a>
+</section>
+
+<section class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Каталог товаров</h5>
+                <p class="card-text">
+                    В будущем здесь появятся категории, карточки товаров и фильтры.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Удобная покупка</h5>
+                <p class="card-text">
+                    Проект будет постепенно дорабатываться: корзина, заказы и личный кабинет.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Учебный проект</h5>
+                <p class="card-text">
+                    Главная цель — закрепить Django, маршруты, шаблоны и работу с Git.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
