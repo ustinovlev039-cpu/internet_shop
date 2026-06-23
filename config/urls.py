@@ -25,8 +25,8 @@ urlpatterns = [
     path("", include("catalog.urls")),
 ]
 
-if settigs.DEBUG:
-    urlpatterns += statuc(
+if settings.DUBUG:
+    urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,
     )
