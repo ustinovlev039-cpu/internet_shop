@@ -2,8 +2,21 @@ from django.shortcuts import render
 
 from django.shortcuts import render\
 
+from catalog.models import Contact, Product
+
 def home(request):
-    return render(request, "catalog/home.html")
+    latest_products = Product.objects.order_by("-created_at")[:5]
+
+    print("/nПоследние 5 созданий продуктов:")
+    for product in latest_products:
+        print(
+            f"id={product.id}"
+            f"name={product.name}"
+            f"price={product.price}"
+            f"created_at={product.created_at}"
+        )
+    
+    return render(request, "catalog/home.html", {"latest_products": latest_products})
 
 def contact(request):
     success_message = None

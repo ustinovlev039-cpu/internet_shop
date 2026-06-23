@@ -1,0 +1,39 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 1,
+  "fields": {
+    "name": "Электроника",
+    "description": "телефоны, ipad, да все что нужно"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 2,
+  "fields": {
+    "name": "Дома, да и кухонка",
+    "description": "КУХНИ И ДОМА"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 3,
+  "fields": {
+    "name": "Отцы и дети",
+    "description": "Русская классика!"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "name": "Смартфон",
+    "description": "Смартфон, просто ПУШКА",
+    "image": "",
+    "category": 1,
+    "price": "45990.00",
+    "created_at": "2026-06-23T01:04:01.156Z",
+    "updated_at": "2026-06-23T01:04:01.156Z"
+  }
+}
+]
