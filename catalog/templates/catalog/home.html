@@ -5,46 +5,93 @@
 {% block content %}
 <section class="text-center mb-5">
     <h1 class="display-5 fw-bold">Добро пожаловать в Online Store</h1>
+
     <p class="lead text-muted">
-        Это учебный интернет-магазин, который будет развиваться на протяжении курса.
+        Это учебный интернет-магазин, в котором можно посмотреть товары,
+        узнать подробную информацию о них и добавить новый товар.
     </p>
-    <a href="{% url 'catalog:contacts' %}" class="btn btn-primary btn-lg">
-        Связаться с нами
-    </a>
-</section>
 
-<section class="row g-4">
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Каталог товаров</h5>
-                <p class="card-text">
-                    В будущем здесь появятся категории, карточки товаров и фильтры.
-                </p>
-            </div>
-        </div>
-    </div>
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+        <a href="{% url 'catalog:product_create' %}" class="btn btn-primary btn-lg">
+            Добавить товар
+        </a>
 
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Удобная покупка</h5>
-                <p class="card-text">
-                    Проект будет постепенно дорабатываться: корзина, заказы и личный кабинет.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Учебный проект</h5>
-                <p class="card-text">
-                    Главная цель — закрепить Django, маршруты, шаблоны и работу с Git.
-                </p>
-            </div>
-        </div>
+        <a href="{% url 'catalog:contacts' %}" class="btn btn-outline-secondary btn-lg">
+            Связаться с нами
+        </a>
     </div>
 </section>
+
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Каталог товаров</h2>
+
+        {% if page_obj %}
+            <span class="text-muted">
+                Найдено товаров: {{ page_obj.paginator.count }}
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for product in products %}
+            <div class="col-sm-6 col-lg-4">
+                <article class="card h-100 shadow-sm">
+
+                    {% if product.image %}
+                        <img
+                            src="{{ product.image.url }}"
+                            class="card-img-top"
+                            alt="{{ product.name }}"
+                            style="height: 220px; object-fit: cover;"
+                        >
+                    {% else %}
+                        <div
+                            class="bg-light d-flex align-items-center justify-content-center text-muted"
+                            style="height: 220px;"
+                        >
+                            Нет изображения
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge text-bg-secondary align-self-start mb-2">
+                            {{ product.category.name }}
+                        </span>
+
+                        <h3 class="h5 card-title">
+                            {{ product.name }}
+                        </h3>
+
+                        <p class="card-text text-muted flex-grow-1">
+                            {{ product.description|truncatechars:100 }}
+                        </p>
+
+                        <p class="h5 fw-bold mb-3">
+                            {{ product.price }} ₽
+                        </p>
+
+                        <a
+                            href="{% url 'catalog:product_detail' product.pk %}"
+                            class="btn btn-outline-primary w-100"
+                        >
+                            Подробнее
+                        </a>
+                    </div>
+                </article>
+            </div>
+
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    В каталоге пока нет товаров.
+                    Добавьте первый товар через кнопку «Добавить товар».
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% include "catalog/includes/pagination.html" %}
+
 {% endblock %}

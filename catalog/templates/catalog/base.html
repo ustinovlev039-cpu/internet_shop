@@ -3,34 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Интернет-магазин{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>
+        {% block title %}Интернет-магазин{% endblock %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 </head>
+
 <body class="bg-light d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'catalog:home' %}">Online Store</a>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
 
-        <div class="navbar-nav">
-            <a class="nav-link" href="{% url 'catalog:home' %}">Главная</a>
-            <a class="nav-link" href="{% url 'catalog:contacts' %}">Контакты</a>
+                <a class="navbar-brand" href="{% url 'catalog:home' %}">
+                    Online Store
+                </a>
+
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainMenu"
+                    aria-controls="mainMenu"
+                    aria-expanded="false"
+                    aria-label="Открыть меню"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainMenu">
+                    {% include "catalog/includes/menu.html" %}
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <main class="container py-5 flex-grow-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container">
+            <small>
+                © 2026 Online Store. Учебный проект на Django.
+            </small>
         </div>
-    </div>
-</nav>
+    </footer>
 
-<main class="container py-5 flex-grow-1">
-    {% block content %}
-    {% endblock %}
-</main>
-
-<footer class="bg-dark text-white text-center py-3 mt-5 mt-auto">
-    <div class="container">
-        <small>© 2026 Online Store. Учебный проект на Django.</small>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

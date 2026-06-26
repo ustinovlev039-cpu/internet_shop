@@ -1,22 +1,41 @@
 from django.shortcuts import render
+from django.urls import reverse
+from django.views.generic import CreateView, DetailView, ListView
 
-from django.shortcuts import render\
 
-from catalog.models import Contact, Product
+from catalog.models import Product
 
-def home(request):
-    latest_products = Product.objects.order_by("-created_at")[:5]
+class ProductListView(ListView):
+    model = Product
+    template_name = "catalog/home.html"
+    context_object_name = "products"
+    paginate_by = 6
 
-    print("/nПоследние 5 созданий продуктов:")
-    for product in latest_products:
-        print(
-            f"id={product.id}"
-            f"name={product.name}"
-            f"price={product.price}"
-            f"created_at={product.created_at}"
-        )
+    def get_queryset(self):
+        return Product.objects.select_related("category").order_by("-created_at")
+
+class ProductDetailView(DetailView):
+    model = Product 
+    template_name = "catalog/detail.html"
+    context_object_name = "product"
+
+    def get_queryset(self):
+        return Product.objects.select_related("category")
     
-    return render(request, "catalog/home.html", {"latest_products": latest_products})
+class ProductCreateView(CreateView):
+    model = Product
+    template_name = "catalog/create.html"
+    fields = [
+        "name", 
+        "description", 
+        "image", 
+        "category", 
+        "price"
+    ]
+
+    def get_success_url(self):
+        return reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
+
 
 def contact(request):
     success_message = None

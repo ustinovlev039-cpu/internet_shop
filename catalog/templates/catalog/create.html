@@ -1,0 +1,65 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Добавить товар | Интернет-магазин{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Добавить товар</h1>
+
+            <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary">
+                К каталогу
+            </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="card shadow-sm">
+            {% csrf_token %}
+
+            <div class="card-body">
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-text">
+                                {{ field.help_text }}
+                            </div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            <div class="card-footer bg-white d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    Сохранить товар
+                </button>
+
+                <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary">
+                    Отмена
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
