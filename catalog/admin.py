@@ -11,7 +11,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price', 'category')
     list_filter = ('category', )
     search_filter = ('name', 'description')
-    readonly_fields = ('create_at',)
+    readonly_fields = ('created_at',)
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
     list_display = ("id", "phone", "email", "address", "working_hours")

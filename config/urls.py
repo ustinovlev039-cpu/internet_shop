@@ -25,7 +25,7 @@ urlpatterns = [
     path("", include("catalog.urls")),
 ]
 
-if settings.DUBUG:
+if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT,

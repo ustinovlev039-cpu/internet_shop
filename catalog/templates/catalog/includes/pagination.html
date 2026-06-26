@@ -1,0 +1,66 @@
+{% if is_paginated %}
+    <nav class="mt-5" aria-label="Навигация по страницам каталога">
+        <ul class="pagination justify-content-center flex-wrap">
+
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">
+                        Первая
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}"
+                    >
+                        Назад
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Первая</span>
+                </li>
+
+                <li class="page-item disabled">
+                    <span class="page-link">Назад</span>
+                </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="?page={{ page_obj.next_page_number }}"
+                    >
+                        Вперёд
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}"
+                    >
+                        Последняя
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Вперёд</span>
+                </li>
+
+                <li class="page-item disabled">
+                    <span class="page-link">Последняя</span>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+{% endif %}
