@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, View
 
 
 from catalog.models import Product
@@ -36,20 +36,20 @@ class ProductCreateView(CreateView):
     def get_success_url(self):
         return reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
 
+class ContactView(View):
+    template_name = "catalog/contacts.html"
 
-def contact(request):
-    success_message = None
-
-    if request.method == "POST":
+    def get(self, request):
+        return render(request, self.template_name, {"success_message": None})
+    
+    def post(self, request):
         name = request.POST.get("name")
         email = request.POST.get("email")
         message = request.POST.get("message")
 
+        success_message = None 
+
         if name and email and message:
-            success_message = "Спасибо! Ваше сообщение успешно отправлено."
+            success_message = ("Спасибо! Ваше сообщение успешно отправлено. )")
 
-    context = {
-        "success_message": success_message
-    }
-
-    return render(request, "catalog/contacts.html", context)
+        return render(request, self.template_name, {"success_message": success_message})

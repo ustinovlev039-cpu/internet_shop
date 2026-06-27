@@ -1,0 +1,74 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Управление блогом{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Управление блогом</h1>
+        <p class="text-muted mb-0">
+            Здесь видны все статьи, включая неопубликованные.
+        </p>
+    </div>
+
+    <a href="{% url 'blog:manage_create' %}" class="btn btn-success">
+        + Создать статью
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Заголовок</th>
+                    <th>Статус</th>
+                    <th>Просмотры</th>
+                    <th>Дата создания</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for post in posts %}
+                    <tr>
+                        <td>{{ post.pk }}</td>
+                        <td>{{ post.title }}</td>
+
+                        <td>
+                            {% if post.is_published %}
+                                <span class="badge text-bg-success">
+                                    Опубликовано
+                                </span>
+                            {% else %}
+                                <span class="badge text-bg-secondary">
+                                    Черновик
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ post.views_count }}</td>
+                        <td>{{ post.created_at|date:"d.m.Y H:i" }}</td>
+
+                        <td class="text-end">
+                            <a
+                                href="{% url 'blog:manage_detail' post.pk %}"
+                                class="btn btn-sm btn-outline-dark"
+                            >
+                                Открыть
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            Статей пока нет.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
