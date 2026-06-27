@@ -1,0 +1,30 @@
+{% if widget.is_initial %}
+    <div class="mb-2">
+        Текущее изображение:
+        <a href="{{ widget.value.url }}">{{ widget.value }}</a>
+    </div>
+
+    {% if not widget.required %}
+        <div class="form-check mb-2">
+            <input
+                type="checkbox"
+                name="{{ widget.checkbox_name }}"
+                id="{{ widget.checkbox_id }}"
+                class="form-check-input"
+                {% if widget.attrs.disabled %}disabled{% endif %}
+                {% if widget.attrs.checked %}checked{% endif %}
+            >
+            <label class="form-check-label" for="{{ widget.checkbox_id }}">
+                Очистить изображение
+            </label>
+        </div>
+    {% endif %}
+
+    <div class="form-text mb-2">Заменить изображение:</div>
+{% endif %}
+
+<input
+    type="{{ widget.type }}"
+    name="{{ widget.name }}"
+    {% include "django/forms/widgets/attrs.html" %}
+>
