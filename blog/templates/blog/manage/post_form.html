@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+    {% if object %}
+        Редактирование статьи
+    {% else %}
+        Создание статьи
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                {% if object %}
+                    <h1 class="mb-4">Редактирование статьи</h1>
+                {% else %}
+                    <h1 class="mb-4">Создание статьи</h1>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {{ form.as_p }}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            Сохранить
+                        </button>
+
+                        <a
+                            href="{% url 'blog:manage_list' %}"
+                            class="btn btn-outline-secondary"
+                        >
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

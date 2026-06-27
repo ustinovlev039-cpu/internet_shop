@@ -1,0 +1,75 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Управление: {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Просмотр статьи</h1>
+
+    <div>
+        <a
+            href="{% url 'blog:manage_update' post.pk %}"
+            class="btn btn-warning"
+        >
+            Редактировать
+        </a>
+
+        <a
+            href="{% url 'blog:manage_delete' post.pk %}"
+            class="btn btn-danger"
+        >
+            Удалить
+        </a>
+    </div>
+</div>
+
+<article class="card shadow-sm">
+    {% if post.preview %}
+        <img
+            src="{{ post.preview.url }}"
+            class="card-img-top"
+            alt="{{ post.title }}"
+            style="max-height: 500px; object-fit: cover;"
+        >
+    {% endif %}
+
+    <div class="card-body p-4 p-md-5">
+        <h2>{{ post.title }}</h2>
+
+        <p class="text-secondary">
+            Создано: {{ post.created_at|date:"d.m.Y H:i" }}
+            · просмотров: {{ post.views_count }}
+            ·
+            {% if post.is_published %}
+                <span class="text-success">Опубликовано</span>
+            {% else %}
+                <span class="text-danger">Черновик</span>
+            {% endif %}
+        </p>
+
+        <hr>
+
+        <div class="fs-5">
+            {{ post.content|linebreaks }}
+        </div>
+
+        <div class="mt-4">
+            <a
+                href="{% url 'blog:manage_list' %}"
+                class="btn btn-outline-secondary"
+            >
+                ← Ко всем статьям
+            </a>
+
+            {% if post.is_published %}
+                <a
+                    href="{% url 'blog:post_detail' post.pk %}"
+                    class="btn btn-dark"
+                >
+                    Открыть публичную страницу
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</article>
+{% endblock %}

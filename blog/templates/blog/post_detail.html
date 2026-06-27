@@ -1,0 +1,35 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<article class="card shadow-sm">
+    {% if post.preview %}
+        <img
+            src="{{ post.preview.url }}"
+            class="card-img-top"
+            alt="{{ post.title }}"
+            style="max-height: 500px; object-fit: cover;"
+        >
+    {% endif %}
+
+    <div class="card-body p-4 p-md-5">
+        <h1 class="mb-3">{{ post.title }}</h1>
+
+        <p class="text-secondary">
+            Дата публикации: {{ post.created_at|date:"d.m.Y H:i" }}
+            · просмотров: {{ post.views_count }}
+        </p>
+
+        <hr>
+
+        <div class="fs-5">
+            {{ post.content|linebreaks }}
+        </div>
+
+        <a href="{% url 'blog:post_list' %}" class="btn btn-outline-secondary mt-4">
+            ← Назад к статьям
+        </a>
+    </div>
+</article>
+{% endblock %}
