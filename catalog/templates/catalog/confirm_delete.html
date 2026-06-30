@@ -1,0 +1,38 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Удаление товара | Интернет-магазин{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-danger shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h3 text-danger mb-3">
+                    Удалить товар?
+                </h1>
+
+                <p class="mb-4">
+                    Вы действительно хотите удалить товар
+                    <strong>«{{ product.name }}»</strong>?
+                    Это действие нельзя отменить.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-danger">
+                        Да, удалить
+                    </button>
+
+                    <a
+                        href="{% url 'catalog:product_detail' product.pk %}"
+                        class="btn btn-outline-secondary ms-2"
+                    >
+                        Отмена
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

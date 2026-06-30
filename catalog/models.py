@@ -1,6 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=150, unique=True, verbose_name="Наименование")
@@ -13,6 +13,12 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 class Product(models.Model):
+    class PublicationStatus(models.TextChoices):
+        DRAFT = "draft", "Черновик"
+        PENDING = "pending", "На модерации"
+        PUBLISHED = "published", "Опубликован"
+        REJECTED = "rejected", "Отклонён"
+        UNPUBLISHED = "unpublished", "Снят с публикации"
     name = models.CharField(max_length=255, db_index=True, verbose_name="Наименование")
     description = models.TextField(blank=True, verbose_name="Описание")
     image = models.ImageField(upload_to="products/%Y/%m/%d/", blank=True, verbose_name="Изображение")
@@ -21,10 +27,15 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
 
+    status = models.CharField(max_length=20, choices=PublicationStatus.choices, default=PublicationStatus.PENDING, verbose_name="Статус публикации")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products", verbose_name="Владелец", null=True, blank=True)
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
         ordering = ["-created_at"]
+
+        permissions = [("can_unpublish_product", "Может снимать товар с публикации")]
 
     def __str__(self):
         return self.name

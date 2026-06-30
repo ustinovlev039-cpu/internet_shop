@@ -3,6 +3,7 @@
 {% block title %}
     {{ product.name }} | Интернет-магазин
 {% endblock %}
+
 {% block content %}
 <div class="row g-4">
 
@@ -25,9 +26,34 @@
     </div>
 
     <div class="col-md-6">
-        <span class="badge text-bg-secondary mb-3">
-            {{ product.category.name }}
-        </span>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge text-bg-secondary">
+                <a
+                    href="{% url 'catalog:category_products' product.category_id %}"
+                    class="text-white text-decoration-none"
+                >
+                    {{ product.category.name }}
+                </a>
+            </span>
+
+            {% if product.status == "published" %}
+                <span class="badge text-bg-success">
+                    {{ product.get_status_display }}
+                </span>
+            {% elif product.status == "pending" %}
+                <span class="badge text-bg-warning">
+                    {{ product.get_status_display }}
+                </span>
+            {% elif product.status == "rejected" %}
+                <span class="badge text-bg-danger">
+                    {{ product.get_status_display }}
+                </span>
+            {% else %}
+                <span class="badge text-bg-dark">
+                    {{ product.get_status_display }}
+                </span>
+            {% endif %}
+        </div>
 
         <h1 class="mb-3">
             {{ product.name }}
@@ -41,51 +67,103 @@
             Описание товара
         </h2>
 
-        <p class="text-muted" style="white-space: pre-line;">
-            {{ product.description|default:"Описание пока не добавлено." }}
-        </p>
+        <div class="mb-4">
+            {% if product.description %}
+                <p class="text-muted mb-0">
+                    {{ product.description|linebreaksbr }}
+                </p>
+            {% else %}
+                <p class="text-muted mb-0">
+                    Описание для этого товара пока не добавлено.
+                </p>
+            {% endif %}
+        </div>
 
-        <hr>
+        <div class="border-top pt-3 mb-4">
+            <p class="mb-1">
+                <strong>Добавил:</strong>
 
-        <p class="small text-muted mb-4">
-            Добавлен:
-            {{ product.created_at|date:"d.m.Y H:i" }}
-            <br>
+                {% if product.owner %}
+                    {{ product.owner }}
+                {% else %}
+                    Не указан
+                {% endif %}
+            </p>
 
-            Последнее изменение:
-            {{ product.updated_at|date:"d.m.Y H:i" }}
-        </p>
+            <p class="small text-muted mb-0">
+                Добавлен:
+                {{ product.created_at|date:"d.m.Y H:i" }}
 
-        <div class="d-flex gap-2 flex-wrap">
-            <a
-                href="{% url 'catalog:product_update' product.pk %}"
-                class="btn btn-primary"
-            >
-                Редактировать
-            </a>
+                <br>
 
-            <a
-                href="{% url 'catalog:product_delete' product.pk %}"
-                class="btn btn-outline-danger"
-            >
-                Удалить
-            </a>
+                Последнее изменение:
+                {{ product.updated_at|date:"d.m.Y H:i" }}
+            </p>
+        </div>
 
-            <a
-                href="{% url 'catalog:product_create' %}"
-                class="btn btn-outline-success"
-            >
-                Добавить товар
-            </a>
-
+        <div class="d-flex gap-2 flex-wrap mb-3">
             <a
                 href="{% url 'catalog:home' %}"
                 class="btn btn-outline-secondary"
             >
                 ← Вернуться в каталог
             </a>
-        </div>
-    </div>
 
+            {% if user.is_authenticated %}
+                <a
+                    href="{% url 'catalog:product_create' %}"
+                    class="btn btn-outline-success"
+                >
+                    Добавить товар
+                </a>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <div class="d-flex flex-wrap gap-2">
+                {% if user == product.owner or perms.catalog.can_unpublish_product %}
+                    <a
+                        href="{% url 'catalog:product_update' product.pk %}"
+                        class="btn btn-primary"
+                    >
+                        Редактировать
+                    </a>
+
+                {% endif %}
+
+                {% if user == product.owner or perms.catalog.delete_product %}
+                    <a
+                        href="{% url 'catalog:product_delete' product.pk %}"
+                        class="btn btn-outline-danger"
+                    >
+                        Удалить
+                    </a>
+                {% endif %}
+
+                {% if perms.catalog.can_unpublish_product and product.status == "published" %}
+                    <form
+                        method="post"
+                        action="{% url 'catalog:product_unpublish' product.pk %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-warning"
+                        >
+                            Снять с публикации
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if user == product.owner and product.status == "pending" %}
+            <div class="alert alert-warning mt-4 mb-0">
+                Товар отправлен на модерацию. Он появится в общем каталоге
+                только после публикации.
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
