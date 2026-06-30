@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -10,7 +11,7 @@ from django.views.generic import (
 
 from .models import BlogPost
 
-class BlogPostListView(ListView):
+class BlogPostListView(LoginRequiredMixin, ListView):
     model = BlogPost
     template_name = "blog/post_list.html"
     context_object_name = "posts"
@@ -19,7 +20,7 @@ class BlogPostListView(ListView):
         return BlogPost.objects.filter(is_published=True).order_by("-created_at")
 
 
-class BlogPostDetailView(DetailView):
+class BlogPostDetailView(LoginRequiredMixin, DetailView):
     model = BlogPost
     template_name = "blog/post_detail.html"
     context_object_name = "post"
@@ -35,7 +36,7 @@ class BlogPostDetailView(DetailView):
         post.refresh_from_db(fields=["views_count"])
         return post
 
-class BlogPostManageListView(ListView):
+class BlogPostManageListView(LoginRequiredMixin, ListView):
     model = BlogPost
     template_name = "blog/manage/post_list.html"
     context_object_name = "posts"
@@ -44,13 +45,13 @@ class BlogPostManageListView(ListView):
         return BlogPost.objects.all().order_by("-created_at")
 
 
-class BlogPostManageDetailView(DetailView):
+class BlogPostManageDetailView(LoginRequiredMixin, DetailView):
     model = BlogPost
     template_name = "blog/manage/post_detail.html"
     context_object_name = "post"
 
 
-class BlogPostCreateView(CreateView):
+class BlogPostCreateView(LoginRequiredMixin, CreateView):
     model = BlogPost
     template_name = "blog/manage/post_form.html"
     fields = ["title", "content", "preview", "is_published",]
@@ -58,7 +59,7 @@ class BlogPostCreateView(CreateView):
     success_url = reverse_lazy("blog:manage_list")
 
 
-class BlogPostUpdateView(UpdateView):
+class BlogPostUpdateView(LoginRequiredMixin, UpdateView):
     model = BlogPost
     template_name = "blog/manage/post_form.html"
     fields = ["title", "content", "preview", "is_published",]
@@ -67,7 +68,7 @@ class BlogPostUpdateView(UpdateView):
         return reverse("blog:manage_detail", kwargs={"pk": self.object.pk})
 
 
-class BlogPostDeleteView(DeleteView):
+class BlogPostDeleteView(LoginRequiredMixin, DeleteView):
     model = BlogPost
     template_name = "blog/manage/post_confirm_delete.html"
     success_url = reverse_lazy("blog:manage_list")

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, View
@@ -5,7 +6,7 @@ from django.views.generic import CreateView, DetailView, ListView, View
 
 from catalog.models import Product
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = "catalog/home.html"
     context_object_name = "products"
@@ -14,7 +15,7 @@ class ProductListView(ListView):
     def get_queryset(self):
         return Product.objects.select_related("category").order_by("-created_at")
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product 
     template_name = "catalog/detail.html"
     context_object_name = "product"
@@ -22,7 +23,7 @@ class ProductDetailView(DetailView):
     def get_queryset(self):
         return Product.objects.select_related("category")
     
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     template_name = "catalog/create.html"
     fields = [
@@ -36,7 +37,7 @@ class ProductCreateView(CreateView):
     def get_success_url(self):
         return reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
 
-class ContactView(View):
+class ContactView(LoginRequiredMixin, View):
     template_name = "catalog/contacts.html"
 
     def get(self, request):
