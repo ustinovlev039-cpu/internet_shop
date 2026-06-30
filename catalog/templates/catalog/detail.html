@@ -3,8 +3,10 @@
 {% block title %}
     {{ product.name }} | Интернет-магазин
 {% endblock %}
+
 {% block content %}
 <div class="row g-4">
+
     <div class="col-md-6">
         {% if product.image %}
             <img
@@ -26,7 +28,12 @@
     <div class="col-md-6">
         <div class="d-flex flex-wrap gap-2 mb-3">
             <span class="badge text-bg-secondary">
-                {{ product.category.name }}
+                <a
+                    href="{% url 'catalog:category_products' product.category_id %}"
+                    class="text-white text-decoration-none"
+                >
+                    {{ product.category.name }}
+                </a>
             </span>
 
             {% if product.status == "published" %}
@@ -60,9 +67,22 @@
             Описание товара
         </h2>
 
+        <div class="mb-4">
+            {% if product.description %}
+                <p class="text-muted mb-0">
+                    {{ product.description|linebreaksbr }}
+                </p>
+            {% else %}
+                <p class="text-muted mb-0">
+                    Описание для этого товара пока не добавлено.
+                </p>
+            {% endif %}
+        </div>
+
         <div class="border-top pt-3 mb-4">
             <p class="mb-1">
                 <strong>Добавил:</strong>
+
                 {% if product.owner %}
                     {{ product.owner }}
                 {% else %}
@@ -70,45 +90,33 @@
                 {% endif %}
             </p>
 
-        <hr>
+            <p class="small text-muted mb-0">
+                Добавлен:
+                {{ product.created_at|date:"d.m.Y H:i" }}
 
-        <p class="small text-muted mb-4">
-            Добавлен:
-            {{ product.created_at|date:"d.m.Y H:i" }}
-            <br>
+                <br>
 
-            Последнее изменение:
-            {{ product.updated_at|date:"d.m.Y H:i" }}
-        </p>
+                Последнее изменение:
+                {{ product.updated_at|date:"d.m.Y H:i" }}
+            </p>
+        </div>
 
-        <div class="d-flex gap-2 flex-wrap">
-            <a
-                href="{% url 'catalog:product_update' product.pk %}"
-                class="btn btn-primary"
-            >
-                Редактировать
-            </a>
-
-            <a
-                href="{% url 'catalog:product_delete' product.pk %}"
-                class="btn btn-outline-danger"
-            >
-                Удалить
-            </a>
-
-            <a
-                href="{% url 'catalog:product_create' %}"
-                class="btn btn-outline-success"
-            >
-                Добавить товар
-            </a>
-
+        <div class="d-flex gap-2 flex-wrap mb-3">
             <a
                 href="{% url 'catalog:home' %}"
                 class="btn btn-outline-secondary"
             >
                 ← Вернуться в каталог
             </a>
+
+            {% if user.is_authenticated %}
+                <a
+                    href="{% url 'catalog:product_create' %}"
+                    class="btn btn-outline-success"
+                >
+                    Добавить товар
+                </a>
+            {% endif %}
         </div>
 
         {% if user.is_authenticated %}
@@ -120,6 +128,7 @@
                     >
                         Редактировать
                     </a>
+
                 {% endif %}
 
                 {% if user == product.owner or perms.catalog.delete_product %}
@@ -138,7 +147,10 @@
                     >
                         {% csrf_token %}
 
-                        <button type="submit" class="btn btn-warning">
+                        <button
+                            type="submit"
+                            class="btn btn-warning"
+                        >
                             Снять с публикации
                         </button>
                     </form>

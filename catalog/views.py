@@ -1,70 +1,70 @@
-<<<<<<< HEAD
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
     ListView,
     UpdateView,
-    View,
 )
 
 from catalog.forms import ProductForm
-from catalog.models import Product
+from catalog.models import Category, Product
+from catalog.services.products import (
+    get_products_by_category,
+    get_published_products,
+)
+
 
 class ProductListView(LoginRequiredMixin, ListView):
-=======
-from django.contrib import messages
-from django.contrib.auth.mixins import (
-    LoginRequiredMixin,
-    PermissionRequiredMixin,
-    UserPassesTestMixin,
-)
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
-from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
-
-from .models import Product
-
-
-class ProductListView(ListView):
->>>>>>> a4bd209 (Сделанная rbac)
-    model = Product
     template_name = "catalog/home.html"
     context_object_name = "products"
     paginate_by = 6
 
     def get_queryset(self):
-        return (
-            Product.objects
-            .select_related("category", "owner")
-            .filter(
-                status=Product.PublicationStatus.PUBLISHED,
-            )
-            .order_by("-created_at")
-        )
+        return get_published_products()
 
 
-class MyProductListView(LoginRequiredMixin, ListView):
-    model = Product
-    template_name = "catalog/my_products.html"
+class CategoryProductListView(LoginRequiredMixin, ListView):
+    template_name = "catalog/category_products.html"
     context_object_name = "products"
     paginate_by = 6
 
     def get_queryset(self):
-        return (
-            Product.objects
-            .select_related("category")
-            .filter(owner=self.request.user)
-            .order_by("-created_at")
+        self.category = get_object_or_404(
+            Category,
+            pk=self.kwargs["category_id"],
         )
 
+        return get_products_by_category(self.category.pk)
 
-class ProductDetailView(DetailView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["category"] = self.category
+
+        return context
+
+
+@method_decorator(
+    cache_page(60 * 5, key_prefix="catalog_product_detail"),
+    name="dispatch",
+)
+@method_decorator(vary_on_cookie, name="dispatch")
+class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = "catalog/detail.html"
     context_object_name = "product"
@@ -105,30 +105,25 @@ class ProductDetailView(DetailView):
         return product
 
 
+class MyProductListView(LoginRequiredMixin, ListView):
+    model = Product
+    template_name = "catalog/my_products.html"
+    context_object_name = "products"
+    paginate_by = 6
+
+    def get_queryset(self):
+        return (
+            Product.objects
+            .select_related("category")
+            .filter(owner=self.request.user)
+            .order_by("-created_at")
+        )
+
+
 class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
-<<<<<<< HEAD
     form_class = ProductForm
     template_name = "catalog/product_form.html"
-
-    def get_success_url(self):
-        return reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
-
-
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    template_name = "catalog/product_form.html"
-=======
-    template_name = "catalog/create.html"
-    fields = [
-        "name",
-        "description",
-        "image",
-        "category",
-        "price",
-    ]
->>>>>>> a4bd209 (Сделанная rbac)
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -143,36 +138,24 @@ class ProductUpdateView(UpdateView):
         )
 
 
-<<<<<<< HEAD
-    def get(self, request):
-        return render(request, self.template_name, {"success_message": None})
-
-    def post(self, request):
-=======
 class ProductUpdateView(
     LoginRequiredMixin,
     UserPassesTestMixin,
     UpdateView,
 ):
     model = Product
-    template_name = "catalog/update.html"
-    fields = [
-        "name",
-        "description",
-        "image",
-        "category",
-        "price",
-    ]
+    form_class = ProductForm
+    template_name = "catalog/product_form.html"
 
     def test_func(self):
         product = self.get_object()
 
-        is_owner = product.owner_id == self.request.user.id
-        is_moderator = self.request.user.has_perm(
-            "catalog.can_unpublish_product",
+        return (
+            product.owner_id == self.request.user.id
+            or self.request.user.has_perm(
+                "catalog.can_unpublish_product"
+            )
         )
-
-        return is_owner or is_moderator
 
     def handle_no_permission(self):
         messages.error(
@@ -180,6 +163,11 @@ class ProductUpdateView(
             "Редактировать товар может только его владелец или модератор.",
         )
         return redirect("catalog:home")
+
+    def form_valid(self, form):
+        form.instance.status = Product.PublicationStatus.PENDING
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -194,33 +182,24 @@ class ProductDeleteView(
     DeleteView,
 ):
     model = Product
-    template_name = "catalog/confirm_delete.html"
+    template_name = "catalog/product_confirm_delete.html"
     context_object_name = "product"
+    success_url = reverse_lazy("catalog:home")
 
     def test_func(self):
         product = self.get_object()
 
-        is_owner = product.owner_id == self.request.user.id
-        is_moderator = self.request.user.has_perm(
-            "catalog.delete_product",
+        return (
+            product.owner_id == self.request.user.id
+            or self.request.user.has_perm("catalog.delete_product")
         )
-
-        return is_owner or is_moderator
 
     def handle_no_permission(self):
         messages.error(
             self.request,
-            "Удалить товар может только владелец или модератор.",
+            "Удалить товар может только его владелец или модератор.",
         )
         return redirect("catalog:home")
-
-    def get_success_url(self):
-        product = self.object
-
-        if product.owner_id == self.request.user.id:
-            return reverse_lazy("catalog:my_products")
-
-        return reverse_lazy("catalog:home")
 
 
 class ProductUnpublishView(
@@ -231,43 +210,39 @@ class ProductUnpublishView(
     permission_required = "catalog.can_unpublish_product"
     raise_exception = True
 
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            raise PermissionDenied
+
+        return redirect_to_login(
+            self.request.get_full_path(),
+            self.get_login_url(),
+            self.get_redirect_field_name(),
+        )
+
     def post(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
-
         product.status = Product.PublicationStatus.UNPUBLISHED
         product.save(update_fields=["status"])
 
-        messages.success(
-            request,
-            "Товар снят с публикации.",
-        )
+        messages.success(request, "Товар снят с публикации.")
 
-        return redirect(
-            "catalog:product_detail",
-            pk=product.pk,
-        )
+        return redirect("catalog:product_detail", pk=product.pk)
 
 
+@login_required
 def contact(request):
     success_message = None
 
     if request.method == "POST":
->>>>>>> a4bd209 (Сделанная rbac)
         name = request.POST.get("name")
         email = request.POST.get("email")
         message = request.POST.get("message")
 
-<<<<<<< HEAD
-        success_message = None
-
-        if name and email and message:
-            success_message = "Спасибо! Ваше сообщение успешно отправлено. )"
-=======
         if name and email and message:
             success_message = (
                 "Спасибо! Ваше сообщение успешно отправлено."
             )
->>>>>>> a4bd209 (Сделанная rbac)
 
     return render(
         request,

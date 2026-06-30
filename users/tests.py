@@ -14,6 +14,8 @@ class AnonymousAccessTests(SimpleTestCase):
         ("catalog:contacts", None),
         ("catalog:product_create", None),
         ("catalog:product_detail", {"pk": 1}),
+        ("catalog:category_products", {"category_id": 1}),
+        ("catalog:product_unpublish", {"pk": 1}),
         ("blog:post_list", None),
         ("blog:post_detail", {"pk": 1}),
         ("blog:manage_list", None),
