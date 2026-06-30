@@ -1,7 +1,8 @@
 {% extends "catalog/base.html" %}
 
-{% block title %}{{ product.name }} | Интернет-магазин{% endblock %}
-
+{% block title %}
+    {{ product.name }} | Интернет-магазин
+{% endblock %}
 {% block content %}
 <div class="row g-4">
 
@@ -15,7 +16,7 @@
             >
         {% else %}
             <div
-                class="bg-light rounded d-flex align-items-center justify-content-center text-muted"
+                class="bg-light rounded border d-flex align-items-center justify-content-center text-muted"
                 style="height: 400px;"
             >
                 Нет изображения
@@ -28,13 +29,17 @@
             {{ product.category.name }}
         </span>
 
-        <h1 class="mb-3">{{ product.name }}</h1>
+        <h1 class="mb-3">
+            {{ product.name }}
+        </h1>
 
         <p class="display-6 fw-bold text-primary mb-4">
             {{ product.price }} ₽
         </p>
 
-        <h2 class="h4">Описание товара</h2>
+        <h2 class="h4 mb-3">
+            Описание товара
+        </h2>
 
         <p class="text-muted" style="white-space: pre-line;">
             {{ product.description|default:"Описание пока не добавлено." }}
@@ -43,17 +48,41 @@
         <hr>
 
         <p class="small text-muted mb-4">
-            Добавлен: {{ product.created_at|date:"d.m.Y H:i" }}<br>
-            Последнее изменение: {{ product.updated_at|date:"d.m.Y H:i" }}
+            Добавлен:
+            {{ product.created_at|date:"d.m.Y H:i" }}
+            <br>
+
+            Последнее изменение:
+            {{ product.updated_at|date:"d.m.Y H:i" }}
         </p>
 
         <div class="d-flex gap-2 flex-wrap">
-            <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary">
-                ← Вернуться в каталог
+            <a
+                href="{% url 'catalog:product_update' product.pk %}"
+                class="btn btn-primary"
+            >
+                Редактировать
             </a>
 
-            <a href="{% url 'catalog:product_create' %}" class="btn btn-primary">
+            <a
+                href="{% url 'catalog:product_delete' product.pk %}"
+                class="btn btn-outline-danger"
+            >
+                Удалить
+            </a>
+
+            <a
+                href="{% url 'catalog:product_create' %}"
+                class="btn btn-outline-success"
+            >
                 Добавить товар
+            </a>
+
+            <a
+                href="{% url 'catalog:home' %}"
+                class="btn btn-outline-secondary"
+            >
+                ← Вернуться в каталог
             </a>
         </div>
     </div>

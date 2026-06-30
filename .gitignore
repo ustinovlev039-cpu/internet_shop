@@ -39,6 +39,9 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 .coverage.*
 .cache
@@ -80,6 +83,8 @@ celerybeat-schedule
 
 # dotenv
 .env
+.env.*
+!.env.example
 
 # virtualenv
 venv/
@@ -184,3 +189,6 @@ fabric.properties
 
 # idea folder, uncomment if you don't need it
 .idea
+.vscode/
+.DS_Store
+media/

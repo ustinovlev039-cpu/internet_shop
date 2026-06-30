@@ -1,0 +1,113 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Редактирование товара
+    {% else %}
+        Добавление товара
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="h3 mb-4">
+                        {% if form.instance.pk %}
+                            Редактирование товара
+                        {% else %}
+                            Добавление товара
+                        {% endif %}
+                    </h1>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == "checkbox" %}
+                                <div class="form-check mb-3">
+                                    {{ field }}
+
+                                    <label
+                                        class="form-check-label"
+                                        for="{{ field.id_for_label }}"
+                                    >
+                                        {{ field.label }}
+                                    </label>
+
+                                    {% for error in field.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="mb-3">
+                                    <label
+                                        class="form-label"
+                                        for="{{ field.id_for_label }}"
+                                    >
+                                        {{ field.label }}
+                                    </label>
+
+                                    {{ field }}
+
+                                    {% if field.help_text %}
+                                        <div class="form-text">
+                                            {{ field.help_text }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% for error in field.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if form.instance.image %}
+                            <div class="mb-4">
+                                <p class="mb-2">Текущее изображение:</p>
+
+                                <img
+                                    src="{{ form.instance.image.url }}"
+                                    alt="{{ form.instance.name }}"
+                                    class="img-fluid rounded border"
+                                    style="max-height: 240px;"
+                                >
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if form.instance.pk %}
+                                    Сохранить изменения
+                                {% else %}
+                                    Создать товар
+                                {% endif %}
+                            </button>
+
+                            <a
+                                href="{% url 'catalog:home' %}"
+                                class="btn btn-outline-secondary"
+                            >
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
